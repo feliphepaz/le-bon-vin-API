@@ -35,14 +35,22 @@ function api_wine_get($request) {
   $post = get_post($post_id);
 
   if (!isset($post) || empty($post_id)) {
-    $response = new WP_Error('error', 'Vinho não encontrado.', ['status' => 404]);
+    $response = new WP_Error('error', 'Post não encontrado.', ['status' => 404]);
     return rest_ensure_response($response);
   }
 
-  $wine = wine_data($post);
+  $photo = wine_data($post);
+  $photo['acessos'] = (int) $photo['acessos'] + 1;
+  update_post_meta($post_id, 'acessos', $photo['acessos']);
+
+  $comments = get_comments([
+    'post_id' => $post_id,
+    'order' => 'ASC',
+  ]);
 
   $response = [
-    'wine' => $wine,
+    'photo' => $photo,
+    'comments' => $comments,
   ];
 
   return rest_ensure_response($response);
@@ -67,6 +75,8 @@ function api_wines_get($request) {
   $args = [
     'post_type' => 'post',
     'author' => $_user,
+    'posts_per_page' => $_total,
+    'paged' => $_page,
   ];
 
   $query = new WP_Query($args);
@@ -75,7 +85,7 @@ function api_wines_get($request) {
   $wines = [];
   if ($posts) {
     foreach ($posts as $post) {
-      $wines[] = photo_data($post);
+      $wines[] = wine_data($post);
     }
   }
 

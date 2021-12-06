@@ -6,6 +6,7 @@ $dirbase = get_template_directory();
 require_once $dirbase . '/endpoints/wine_post.php';
 require_once $dirbase . '/endpoints/wine_delete.php';
 require_once $dirbase . '/endpoints/wine_get.php';
+require_once $dirbase . '/endpoints/user_get.php';
 
 function change_api($slug) {
   return 'json';
